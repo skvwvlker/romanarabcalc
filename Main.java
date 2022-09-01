@@ -1,24 +1,33 @@
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-
 public class Main {
-
     static Scanner scanner = new Scanner(System.in);
-    static int num1, num2, result;
-    static char op;
 
-
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args){
         System.out.println("Введите выражение в арабском (1+1) или римском формате (X+V) от 1(I) до 10(X):");
-        String uInput = scanner.nextLine();
-        System.out.println("Ваше выражение: " + uInput);
+        String userInput = scanner.nextLine();
+        System.out.println("Ваше выражение: " + userInput.toUpperCase());
+        Expression exp = new Expression();
+        exp.x = userInput;
+        exp.calc();
+        if (exp.x.contains("i")||exp.x.contains("x")||exp.x.contains("v")){
+            System.out.println("Результат для римских цифр: "+exp.x.toUpperCase()+" = "+exp.calc().toUpperCase());
+        } else{
+            System.out.println("Результат для арабских цифр: "+exp.x+" = "+exp.calc());
+        }
+    }
+}
+class Expression {
+    String x;
+    int num1, num2;
+    char op;
+    public String calc() {
+
         char[] ch = new char[10];
-        for (int i = 0; i < uInput.length(); i++) {
-            ch[i] = uInput.charAt(i);
+        for (int i = 0; i < x.length(); i++) {
+            ch[i] = x.charAt(i);
             try {
-
-
                 if (ch[i] == '+') {
                     op = '+';
                 }
@@ -31,89 +40,85 @@ public class Main {
                 if (ch[i] == '/') {
                     op = '/';
                 }
-
-            } catch (InputMismatchException e){
+            } catch (InputMismatchException e) {
                 throw new InputMismatchException("Cтрока не является математической операцией");
             }
         }
-
-        /// разделить цифры до и после знака
         String charString = String.valueOf(ch);
         String[] chapters = charString.split("[+-/*]");
         String strnum1 = chapters[0];
         String strnum2 = null;
         try {
-           strnum2 = chapters[1];
-        } catch (ArrayIndexOutOfBoundsException e){
-          throw new ArrayIndexOutOfBoundsException("Cтрока не является математической операцией");
-          }
-        if (chapters.length>2){
+            strnum2 = chapters[1];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new ArrayIndexOutOfBoundsException("Cтрока не является математической операцией");
+        }
+        if (chapters.length > 2) {
             System.out.println("формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
             System.exit(0);
-            }
-        strnum2 = strnum2.trim();
-
-
-        /// Перевести в нижний регистр
-        num1 = romNum(strnum1.toLowerCase());
-        num2 = romNum(strnum2.toLowerCase());
-
-        if (num1 < 0 && num2 < 0) {
-            result = 0;
-
-
-        } else {
-            result = calc(num1, op, num2);
-                if (num1 < 0 || num2 < 0){
-                    System.out.println("используются одновременно разные системы счисления");
-                    System.exit(0);
-                }
-            String resultRom = numRom(result);
-            System.out.println("Результат для римских цифр: "+strnum1.toUpperCase()+" "+op+" "+strnum2.toUpperCase()+" = "+resultRom);
         }
+        strnum1 = strnum1.trim();
+        strnum2 = strnum2.trim();
+        strnum1 = strnum1.toLowerCase();
+        strnum2 = strnum2.toLowerCase();
+        boolean checkStr1 = false;
+        boolean checkStr2 = false;
 
-        num1 = Integer.parseInt(strnum1);
-        num2 = Integer.parseInt(strnum2);
-
+        if (strnum1.contains("i")||strnum1.contains("x")||strnum1.contains("v")){
+            checkStr1 = true;
+        }
+        if (strnum2.contains("i")||strnum2.contains("x")||strnum2.contains("v")){
+            checkStr2 = true;
+        }
+        try {
+            if ((checkStr1 && checkStr2) == true){
+                // if (strnum2.contains("i")||strnum2.contains("x")||strnum2.contains("v")){
+                num1 = romNum(strnum1);
+                num2 = romNum(strnum2);
+                //System.out.println("Результат для римских цифр: "+strnum1.toUpperCase()+ op + strnum2.toUpperCase()+" = "+resultRom);
+            } else {
+                num1 = Integer.parseInt(strnum1);
+                num2 = Integer.parseInt(strnum2);
+            }
+        } catch (NumberFormatException e){
+            throw new NumberFormatException("Используются одновременно разные системы счисления");
+        }
         if (num1 > 10 || num2 > 10){
             System.out.println("Значение больше 10, читайте условие для ввода данных.");
             System.exit(0);
         }
-
-        result = calc(num1, op, num2);
-        System.out.println("Результат для арабских цифр: "+num1+" "+op+" "+num2+" = "+result);
-    }
-
-    public static int calc (int x1, char op1, int x2) {
         int result = 0;
-        switch (op1) {
+        switch (op) {
             case '+':
-                result = x1 + x2;
+                result = num1 + num2;
                 break;
             case '-':
-                result = x1 - x2;
+                result = num1 - num2;
                 break;
             case '*':
-                result = x1 * x2;
+                result = num1 * num2;
                 break;
             case '/':
                 try {
-                    result = x1 / x2;
+                    result = num1 / num2;
                 } catch (ArithmeticException | InputMismatchException e) {
                     System.out.println("Ошибка : " + e);
                     System.out.println("На 0 делить нельзя!");
-
                     break;
                 }
                 break;
             default:
                 throw new IllegalArgumentException("Неверный знак операции");
         }
-        return result;
+        if ((checkStr1&&checkStr2)==true){
+            String resultRom = numRom(result);
+            return resultRom;
+        } else {
+            String resultx = Integer.toString(result);
+            return resultx;
+        }
     }
-
-
-    private static String numRom (int numArab) {
+    static String numRom(int numArab) {
         String[] rom = {"O", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX",
                 "XXI", "XXII", "XXIII", "XXIV", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXX", "XXXI", "XXXII", "XXXIII", "XXXIV", "XXXV", "XXXVI", "XXXVII", "XXXVIII", "XXXIX", "XL",
                 "XLI", "XLII", "XLIII", "XLIV", "XLV", "XLVI", "XLVII", "XLVIII", "XLIX", "L", "LI", "LII", "LIII", "LIV", "LV", "LVI", "LVII", "LVIII", "LIX", "LX",
@@ -130,9 +135,8 @@ public class Main {
             throw new ArrayIndexOutOfBoundsException("В римской системе нет отрицательных чисел");
         }
         return s;
-        }
-
-    private static int romNum (String rom) throws InputMismatchException {
+    }
+    static int romNum (String rom) throws InputMismatchException {
         try {
             if (rom.equals("i")) {
                 return 1;
@@ -158,6 +162,6 @@ public class Main {
         } catch (InputMismatchException e) {
             throw new InputMismatchException("используются одновременно разные системы счисления");
         }
-        return -1;
+        return 0;
     }
 }
