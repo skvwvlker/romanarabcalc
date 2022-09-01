@@ -72,10 +72,8 @@ class Expression {
         }
         try {
             if ((checkStr1 && checkStr2) == true){
-                // if (strnum2.contains("i")||strnum2.contains("x")||strnum2.contains("v")){
                 num1 = romNum(strnum1);
                 num2 = romNum(strnum2);
-                //System.out.println("Результат для римских цифр: "+strnum1.toUpperCase()+ op + strnum2.toUpperCase()+" = "+resultRom);
             } else {
                 num1 = Integer.parseInt(strnum1);
                 num2 = Integer.parseInt(strnum2);
